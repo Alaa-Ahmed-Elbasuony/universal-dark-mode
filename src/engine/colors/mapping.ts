@@ -3,12 +3,14 @@ import { contrastRatio } from './contrast';
 import type { Palette } from './palette';
 import { oklchToRgb, rgbToOklch, type Rgba } from './oklch';
 
-export type Role = 'surface' | 'text' | 'border';
+export type Role = 'surface' | 'text' | 'border' | 'accent';
 
 export interface Mapper {
   surface(c: Rgba): Rgba;
   text(c: Rgba): Rgba;
   border(c: Rgba): Rgba;
+  /** Keep hue and chroma, only lift lightness until readable (gradient text, brand-colored glyphs). */
+  accent(c: Rgba): Rgba;
   byRole(role: Role, c: Rgba): Rgba;
 }
 
@@ -36,6 +38,9 @@ const FILL_OVERLAY_MAX_ALPHA = 0.2; // glass fills are faint; `bg-muted/40` on a
 const BORDER_OVERLAY_MAX_ALPHA = 0.4; // outlines can be stronger, and a kept pale border is harmless on light pages
 const isLightOverlay = (o: Oklch, alpha: number, maxAlpha: number): boolean =>
   alpha <= maxAlpha && o.l >= 0.8 && o.c < 0.05;
+
+/** Minimum contrast between a kept colored fill (button, badge) and the page behind it. */
+const MIN_FILL_CONTRAST = 1.8;
 
 interface Stop {
   d: number;
@@ -76,6 +81,7 @@ export function createMapper(p: Palette): Mapper {
     surface: new Map(),
     text: new Map(),
     border: new Map(),
+    accent: new Map(),
   };
   const memo = (role: Role, c: Rgba, compute: (o: Oklch, alpha: number) => Oklch | null): Rgba => {
     if (c.a === 0) return c;
@@ -89,11 +95,24 @@ export function createMapper(p: Palette): Mapper {
     return out;
   };
 
+  /**
+   * A colored fill that is kept as-is (brand button, badge) must still stand out from the page
+   * behind it, otherwise a dark teal button melts into a dark page. Lift lightness just enough.
+   */
+  const keepVisible = (o: Oklch, alpha: number): Oklch | null => {
+    if (alpha < 0.5 || o.c < 0.03) return null;
+    let cur = o;
+    for (let i = 0; i < 30 && contrastRatio(oklchToRgb(cur), p.bgRgb) < MIN_FILL_CONTRAST; i++) {
+      cur = { ...cur, l: Math.min(0.95, cur.l + 0.02) };
+    }
+    return cur === o ? null : cur;
+  };
+
   const surface = (c: Rgba): Rgba =>
     memo('surface', c, (o, alpha) => {
-      if (o.l <= DARK_KEEP) return null; // intentional dark section
+      if (o.l <= DARK_KEEP) return null; // intentional dark section, kept exactly as designed
       if (isLightOverlay(o, alpha, FILL_OVERLAY_MAX_ALPHA)) return null; // glass overlay on a dark design
-      if (o.c >= surfaceBrandChroma(o.l)) return null; // brand surface (buttons, banners)
+      if (o.c >= surfaceBrandChroma(o.l)) return keepVisible(o, alpha); // brand surface (buttons, banners)
       const d = clamp((1 - o.l) / (1 - DARK_KEEP), 0, 1);
       const s = sample(stops, d);
       const tinted = o.c >= 0.012;
@@ -136,10 +155,26 @@ export function createMapper(p: Palette): Mapper {
       };
     });
 
+  const accent = (c: Rgba): Rgba =>
+    memo('accent', c, (o) => {
+      if (o.c < 0.02) return null; // neutrals follow the text rules (handled below)
+      let cur = o;
+      for (let i = 0; i < 40 && contrastRatio(oklchToRgb(cur), p.bgRgb) < 4.5; i++) {
+        cur = { ...cur, l: Math.min(0.97, cur.l + 0.02) };
+      }
+      return cur;
+    });
+  const accentOrText = (c: Rgba): Rgba => {
+    const a = accent(c);
+    return a === c ? text(c) : a;
+  };
+
   return {
     surface,
     text,
     border,
-    byRole: (role, c) => (role === 'surface' ? surface(c) : role === 'text' ? text(c) : border(c)),
+    accent: accentOrText,
+    byRole: (role, c) =>
+      role === 'surface' ? surface(c) : role === 'text' ? text(c) : role === 'accent' ? accentOrText(c) : border(c),
   };
 }

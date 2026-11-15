@@ -3,9 +3,9 @@ import { OwnedSheet } from './css-injector';
 /**
  * i = inline-style override, s = surface fallback, f = contrast fix, m = image dimming,
  * v = SVG paint fix, o = original text color kept over banner images,
- * x = pinned original colors on a user-excluded root, t = light flat texture image darkened by blending.
+ * x = pinned original colors on a user-excluded root, t = light flat texture image darkened by blending, g = gradient text (background-clip:text) stops lightened.
  */
-export type TokenKind = 'i' | 's' | 'f' | 'm' | 'v' | 'o' | 'x' | 't';
+export type TokenKind = 'i' | 's' | 'f' | 'm' | 'v' | 'o' | 'x' | 't' | 'g';
 
 /**
  * Elements needing a per-element correction get a shared token in `data-udm`. Identical

@@ -228,6 +228,26 @@ describe('color mapping', () => {
     expect(m.surface(gray)).not.toEqual(gray);
   });
 
+  it('accent lifts dark teal for gradient text but keeps its hue', () => {
+    const p = generatePalette(THEME_LIST[0]!, 0, 0);
+    const m = createMapper(p);
+    const out = m.accent(rgb(0, 84, 104));
+    expect(contrastRatio(out, rgb(p.bgRgb.r, p.bgRgb.g, p.bgRgb.b))).toBeGreaterThanOrEqual(4.5);
+    expect(Math.abs(rgbToOklch(out).h - rgbToOklch(rgb(0, 84, 104)).h)).toBeLessThan(8);
+    expect(rgbToOklch(out).c).toBeGreaterThan(0.04); // still teal, not gray
+  });
+
+  it('keeps the dark teal brand button fill visible against the page on every theme', () => {
+    const teal = rgb(0, 85, 102); // hsl(195 100% 20%)
+    for (const theme of THEME_LIST) {
+      const p = generatePalette(theme, 0, 0);
+      const out = createMapper(p).surface(teal);
+      expect(out.b, theme.id).toBeGreaterThanOrEqual(teal.b); // kept, at most lifted (never darkened)
+      // A button must stand out from the page behind it (WCAG non-text contrast is 3:1; we require a visible 1.8:1).
+      expect(contrastRatio(out, p.bgRgb), `${theme.id} button vs page`).toBeGreaterThanOrEqual(1.8);
+    }
+  });
+
   it('is deterministic (memoized results are identical)', () => {
     const m = createMapper(generatePalette(THEME_LIST[0]!, 0, 0));
     expect(m.surface(rgb(240, 240, 240))).toBe(m.surface(rgb(240, 240, 240)));
