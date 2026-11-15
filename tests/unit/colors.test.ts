@@ -208,6 +208,10 @@ describe('color mapping', () => {
     const glass = { r: 255, g: 255, b: 255, a: 0.06 };
     expect(m.surface(glass)).toEqual(glass);
     expect(m.border({ r: 255, g: 255, b: 255, a: 0.14 })).toEqual({ r: 255, g: 255, b: 255, a: 0.14 });
+    // A pale 40% panel (Tailwind `bg-muted/40` on a light page) is not glass: it is darkened.
+    const panel = m.surface({ r: 241, g: 245, b: 249, a: 0.4 });
+    expect(panel.r).toBeLessThan(120);
+    expect(panel.a).toBe(0.4);
     // A mostly opaque translucent white (sticky frosted header on a light page) is still darkened.
     const frosted = m.surface({ r: 255, g: 255, b: 255, a: 0.8 });
     expect(frosted.r).toBeLessThan(80);

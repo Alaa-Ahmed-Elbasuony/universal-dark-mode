@@ -8,6 +8,7 @@ import { rgbToOklch } from '../colors/oklch';
 import { generatePalette, type Palette } from '../colors/palette';
 import { dimDeclaration } from '../media/image-protection';
 import { PROTECTED_MEDIA_SELECTORS } from '../media/media-detector';
+import { analyzeTexture, cachedTexture, singleImageUrl, TEXTURE_DECLARATION } from '../media/texture-handler';
 import { summarizeMutations } from '../observation/mutation-processor';
 import { ProcessingQueue } from '../observation/processing-queue';
 import { SheetCollector, type FetchCss } from '../sheets/sheet-collector';
@@ -78,6 +79,7 @@ export class DarkEngine {
   private excludeSelector = '';
   private palette: Palette | null = null;
   private mapper: Mapper | null = null;
+  private readonly texturePending = new Map<string, Set<WeakRef<Element>>>();
   private running = false;
   private observer: MutationObserver | null = null;
   private drainTimer: ReturnType<typeof setTimeout> | null = null;
@@ -483,6 +485,52 @@ export class DarkEngine {
     }
   }
 
+  /**
+   * Elements painted by a single small url() image: apply the blend token if the image is
+   * known to be a light flat texture; otherwise analyze it once and re-queue the elements.
+   */
+  private applyTextures(els: Element[]): void {
+    const reads: Array<[Element, string]> = [];
+    for (const el of els) {
+      const cs = this.win.getComputedStyle(el);
+      const url = singleImageUrl(cs.backgroundImage);
+      // Textures tile; a photo banner is `no-repeat` or `cover`/`contain`.
+      const tiles = cs.backgroundRepeat !== 'no-repeat' && !/cover|contain/.test(cs.backgroundSize);
+      if (url && tiles) reads.push([el, url]);
+      else if (hasTokenKind(el, 't')) reads.push([el, '']);
+    }
+    for (const [el, url] of reads) {
+      const verdict = url ? cachedTexture(url) : 'other';
+      if (verdict === 'light') {
+        stripKind(el, 't');
+        addToken(el, this.tokens.idFor('t', TEXTURE_DECLARATION));
+      } else {
+        stripKind(el, 't');
+        if (verdict === undefined) this.analyzeTextureFor(url, el);
+      }
+    }
+  }
+
+  private analyzeTextureFor(url: string, el: Element): void {
+    let waiting = this.texturePending.get(url);
+    if (waiting) {
+      waiting.add(new WeakRef(el));
+      return;
+    }
+    waiting = new Set([new WeakRef(el)]);
+    this.texturePending.set(url, waiting);
+    void analyzeTexture(url, this.doc).then((verdict) => {
+      const refs = this.texturePending.get(url);
+      this.texturePending.delete(url);
+      if (!this.running || verdict !== 'light' || !refs) return;
+      for (const ref of refs) {
+        const target = ref.deref();
+        if (target?.isConnected) this.queue.add(target);
+      }
+      this.scheduleDrain(0);
+    });
+  }
+
   /** Reads and writes are separated per batch to avoid layout thrashing. */
   private processBatch(all: Element[]): void {
     const mapper = this.mapper;
@@ -524,8 +572,11 @@ export class DarkEngine {
       for (const el of els) if (el.tagName === 'IMG' && el.hasAttribute('data-udm')) stripKind(el, 'm');
     }
 
+    // Phase 2b: light flat texture images (white page columns, title bars) darkened by blending.
+    this.applyTextures(els);
+
     // Phase 3: contrast, SVG paint and banner-text checks against final computed styles.
-    if (surfaces.length) checker.resetCache();
+    checker.resetCache();
     const fixes: Array<[Element, string]> = [];
     const svgFixes: Array<[Element, string]> = [];
     const overBanner: Element[] = [];

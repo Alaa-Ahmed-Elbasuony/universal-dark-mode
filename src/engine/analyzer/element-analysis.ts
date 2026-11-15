@@ -84,6 +84,8 @@ export class ContrastChecker {
   private layer(below: EffectiveBg, cs: CSSStyleDeclaration, node: Element): EffectiveBg {
     const c = parseColor(cs.backgroundColor);
     if (cs.backgroundImage !== 'none') {
+      // A light flat texture we darkened by blending behaves like a plain dark surface.
+      if (c && c.a >= 0.99 && /(^|\s)t\d+(\s|$)/.test(node.getAttribute('data-udm') ?? '')) return { rgb: c, uncertain: false };
       const rgb = c && c.a >= 0.99 ? c : below.rgb;
       return hasUrlImage(cs.backgroundImage) ? { rgb, uncertain: true, image: node } : { rgb, uncertain: true };
     }

@@ -32,8 +32,10 @@ const surfaceBrandChroma = (l: number): number => (l > 0.9 ? BRAND_CHROMA : l > 
  * fields, buttons and outlines. Inverting them into a dark tint would erase those controls,
  * so they are kept: over our dark surfaces they give the same subtle lift.
  */
-const OVERLAY_MAX_ALPHA = 0.4;
-const isLightOverlay = (o: Oklch, alpha: number): boolean => alpha <= OVERLAY_MAX_ALPHA && o.l >= 0.8 && o.c < 0.05;
+const FILL_OVERLAY_MAX_ALPHA = 0.2; // glass fills are faint; `bg-muted/40` on a light page is a pale panel
+const BORDER_OVERLAY_MAX_ALPHA = 0.4; // outlines can be stronger, and a kept pale border is harmless on light pages
+const isLightOverlay = (o: Oklch, alpha: number, maxAlpha: number): boolean =>
+  alpha <= maxAlpha && o.l >= 0.8 && o.c < 0.05;
 
 interface Stop {
   d: number;
@@ -90,7 +92,7 @@ export function createMapper(p: Palette): Mapper {
   const surface = (c: Rgba): Rgba =>
     memo('surface', c, (o, alpha) => {
       if (o.l <= DARK_KEEP) return null; // intentional dark section
-      if (isLightOverlay(o, alpha)) return null; // glass overlay on a dark design
+      if (isLightOverlay(o, alpha, FILL_OVERLAY_MAX_ALPHA)) return null; // glass overlay on a dark design
       if (o.c >= surfaceBrandChroma(o.l)) return null; // brand surface (buttons, banners)
       const d = clamp((1 - o.l) / (1 - DARK_KEEP), 0, 1);
       const s = sample(stops, d);
@@ -124,7 +126,7 @@ export function createMapper(p: Palette): Mapper {
   const border = (c: Rgba): Rgba =>
     memo('border', c, (o, alpha) => {
       if (o.c >= BRAND_CHROMA) return null;
-      if (isLightOverlay(o, alpha)) return null; // keep faint light outlines visible
+      if (isLightOverlay(o, alpha, BORDER_OVERLAY_MAX_ALPHA)) return null; // keep faint light outlines visible
       // Prominent (dark) borders stay prominent; faint (light) borders stay faint.
       const prominence = clamp(1 - o.l, 0, 1);
       return {
