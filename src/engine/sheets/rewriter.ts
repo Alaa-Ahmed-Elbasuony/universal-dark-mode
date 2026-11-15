@@ -104,25 +104,6 @@ function shorthandOverride(
   return `${colorLonghand}:${formatRgba(mapper.byRole(role, c))}!important`;
 }
 
-/**
- * Value of a `--tw-gradient-*` definition with its color mapped. Colors written through the
- * design system's variables (`hsl(var(--background))`, shadcn style) are resolved from the root
- * first. Tailwind's own position variables stay as they are (they are often unset), and values
- * that still depend on other per-element variables (`--tw-gradient-stops`) are skipped.
- */
-function mapGradientVar(raw: string, ctx: Ctx): string | null {
-  const positions: string[] = [];
-  const masked = raw.replace(/var\(--tw-gradient-(?:from|via|to)-position\)/g, (m) => {
-    positions.push(m);
-    return `@@${positions.length - 1}@@`;
-  });
-  const resolved = masked.includes('var(') ? ctx.vars.resolve(masked) : masked;
-  if (resolved === null || /var\(--tw-/.test(resolved)) return null;
-  const mapped = mapValue(resolved, 'surface', ctx.mapper);
-  if (mapped === null) return null;
-  return mapped.replace(/@@(\d+)@@/g, (_m, i: string) => positions[Number(i)] ?? '');
-}
-
 function preludeOf(rule: CSSRule): string | null {
   const name = rule.constructor.name;
   const r = rule as unknown as Record<string, unknown>;
@@ -148,10 +129,8 @@ function rewriteStyleRule(rule: CSSStyleRule, ctx: Ctx, nested: boolean): string
     if (isGradientVar) {
       // Gradient stop colors live in per-element variables (`.to-white{--tw-gradient-to:#fff}`),
       // which the root-based resolver can't see. Map the definition itself.
-      // Always emitted, even when unchanged: an `!important` value from an earlier rule
-      // (`from-*` sets a transparent `--tw-gradient-to`) would otherwise beat a later `to-*`
-      // rule whose color needed no change.
-      if (raw) decls.push(`${prop}:${mapGradientVar(raw, ctx) ?? raw}!important`);
+      const mappedVar = raw ? mapValue(raw, 'surface', ctx.mapper) : null;
+      if (mappedVar !== null) decls.push(`${prop}:${mappedVar}!important`);
       continue;
     }
     if (!raw) {
