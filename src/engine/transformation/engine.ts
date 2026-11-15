@@ -494,9 +494,10 @@ export class DarkEngine {
     for (const el of els) {
       const cs = this.win.getComputedStyle(el);
       const url = singleImageUrl(cs.backgroundImage);
-      // Textures tile; a photo banner is `no-repeat` or `cover`/`contain`.
-      const tiles = cs.backgroundRepeat !== 'no-repeat' && !/cover|contain/.test(cs.backgroundSize);
-      if (url && tiles) reads.push([el, url]);
+      // Photo banners are sized with `cover`/`contain`; chrome pieces (title bars, footers,
+      // columns) are drawn at their natural size, tiled or not. The image content test decides.
+      const chrome = !/cover|contain/.test(cs.backgroundSize);
+      if (url && chrome) reads.push([el, url]);
       else if (hasTokenKind(el, 't')) reads.push([el, '']);
     }
     for (const [el, url] of reads) {
