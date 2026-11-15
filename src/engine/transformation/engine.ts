@@ -581,7 +581,13 @@ export class DarkEngine {
     const fixes: Array<[Element, string]> = [];
     const svgFixes: Array<[Element, string]> = [];
     const overBanner: Element[] = [];
+    const outlines: Array<[Element, string | null]> = [];
     for (const el of els) {
+      // Judge the button without our own outline applied, or it would count as "already visible".
+      const hadOutline = hasTokenKind(el, 'b');
+      if (hadOutline) stripKind(el, 'b');
+      const outline = checker.buttonBorder(el);
+      if (outline || hadOutline) outlines.push([el, outline]);
       if (checker.overImage(el)) {
         if (!hasTokenKind(el, 'o')) overBanner.push(el);
         continue;
@@ -590,6 +596,10 @@ export class DarkEngine {
       if (decl) fixes.push([el, decl]);
       const svg = checker.svg(el);
       if (svg) svgFixes.push([el, svg]);
+    }
+    for (const [el, decl] of outlines) {
+      stripKind(el, 'b');
+      if (decl) addToken(el, this.tokens.idFor('b', decl));
     }
     for (const [el, decl] of fixes) {
       stripKind(el, 'f');

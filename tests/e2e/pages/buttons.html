@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Button visibility</title>
+<style>
+  body { margin: 0; padding: 20px; background: #fff; color: #111; font: 14px system-ui, sans-serif; }
+  button, .btn { font: inherit; padding: 10px 18px; margin: 8px 8px 8px 0; cursor: pointer; }
+  /* ghost: no fill, no border: only text */
+  #ghost { background: transparent; border: 0; color: #111; }
+  /* fill is the same off-white as the page */
+  #flat { background: #f6f6f6; border: 0; color: #111; }
+  /* page's own faint border on a white page */
+  #faint { background: #fff; border: 1px solid #eee; color: #111; }
+  /* visible fill and clear border: untouched */
+  #solid { background: #1c7ed6; border: 0; color: #fff; }
+  #outlined { background: transparent; border: 1px solid #333; color: #111; }
+  /* gradient: visible by itself */
+  #grad { border: 0; color: #fff; background: linear-gradient(90deg, #1c7ed6, #15aabf); }
+  /* tiny icon button */
+  #icon { width: 18px; height: 18px; padding: 0; background: transparent; border: 0; }
+  #aria { display: inline-block; background: transparent; border: 0; }
+  .card { background: #fff; padding: 12px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<button id="ghost">Ghost</button>
+<button id="flat">Flat</button>
+<button id="faint">Faint border</button>
+<button id="solid">Solid</button>
+<button id="outlined">Outlined</button>
+<button id="grad">Gradient</button>
+<button id="icon" aria-label="info"></button>
+<div class="card"><span id="aria" class="btn" role="button" tabindex="0">Role button</span></div>
+<input id="submit" type="submit" value="Submit" style="background:transparent;border:0;color:#111;padding:10px 18px">
+</body>
+</html>

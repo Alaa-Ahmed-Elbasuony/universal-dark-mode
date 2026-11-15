@@ -1,6 +1,6 @@
 import { formatRgba, parseColor } from '../colors/color';
 import { adjustForContrast, compositeOver, contrastRatio } from '../colors/contrast';
-import { rgbToOklch } from '../colors/oklch';
+import { oklchToRgb, rgbToOklch } from '../colors/oklch';
 import type { Mapper, Role } from '../colors/mapping';
 import type { Palette } from '../colors/palette';
 import type { Rgba } from '../colors/oklch';
@@ -140,6 +140,39 @@ export class ContrastChecker {
     if (o.l <= brightestMapped || o.c >= 0.1) return null;
     const mapped = mapper.surface(c);
     return `background-color:${formatRgba(mapped)}!important`;
+  }
+
+  /**
+   * Buttons must read as buttons. A button whose fill blends into the surface behind it and that
+   * has no visible border of its own gets a 1px outline, drawn as an inset shadow (an actual
+   * border would shift the layout). Buttons with their own visible fill, gradient, image or
+   * border, and tiny icon buttons, are left as they are.
+   */
+  buttonBorder(el: Element): string | null {
+    const isButton =
+      el.tagName === 'BUTTON' ||
+      (el.tagName === 'INPUT' && /^(button|submit|reset)$/i.test((el as HTMLInputElement).type)) ||
+      el.getAttribute('role') === 'button';
+    if (!isButton) return null;
+    const cs = this.view.getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return null;
+    const r = el.getBoundingClientRect();
+    if (r.width < 28 || r.height < 20) return null;
+
+    const own = this.effectiveBg(el);
+    if (own.uncertain) return null; // gradient or image: visible by itself
+    const parent = el.parentElement ? this.effectiveBg(el.parentElement) : { rgb: this.palette.bgRgb };
+    if (contrastRatio(own.rgb, parent.rgb) >= 1.3) return null; // has a visible fill
+
+    const borderWidth = parseFloat(cs.borderTopWidth) || 0;
+    if (borderWidth >= 1 && cs.borderTopStyle !== 'none') {
+      const bc = parseColor(cs.borderTopColor);
+      if (bc && bc.a > 0.2 && contrastRatio(compositeOver(bc, parent.rgb), parent.rgb) >= 1.4) return null;
+    }
+    const line = formatRgba(adjustForContrast(oklchToRgb(this.palette.border), parent.rgb, 2));
+    if (borderWidth >= 1 && cs.borderTopStyle !== 'none') return `border-color:${line}!important`;
+    const existing = cs.boxShadow && cs.boxShadow !== 'none' ? `,${cs.boxShadow}` : '';
+    return `box-shadow:inset 0 0 0 1px ${line}${existing}!important`;
   }
 
   /** Paint (fill/stroke) fix for inline SVG shapes that vanish on dark surfaces. */
