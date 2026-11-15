@@ -53,11 +53,6 @@ test.describe('natively dark pages with translucent "glass" controls', () => {
     await waitForDark(ext, page);
     await page.waitForTimeout(300);
     await page.screenshot({ path: 'test-results/visual/82-gradient-fade.png' });
-    // Gradient text: dark teal stops must be lifted so the heading stays readable.
-    const stops = await css(page, '#gtext', 'background-image');
-    const channels = [...stops.matchAll(/rgba?\((\d+), (\d+), (\d+)/g)].map((m) => Math.max(+m[1]!, +m[2]!, +m[3]!));
-    expect(channels.length).toBeGreaterThan(0);
-    for (const c of channels) expect(c, `gradient text stop ${stops}`).toBeGreaterThan(110);
     for (const id of ['#fade', '#strip']) {
       const bg = await css(page, id, 'background-image');
       expect(bg, `${id} must not keep white stops`).not.toMatch(/rgb\(255, 255, 255\)/);

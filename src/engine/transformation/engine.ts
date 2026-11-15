@@ -11,7 +11,6 @@ import { PROTECTED_MEDIA_SELECTORS } from '../media/media-detector';
 import { analyzeTexture, cachedTexture, singleImageUrl, TEXTURE_DECLARATION } from '../media/texture-handler';
 import { summarizeMutations } from '../observation/mutation-processor';
 import { ProcessingQueue } from '../observation/processing-queue';
-import { mapValue } from '../sheets/rewriter';
 import { SheetCollector, type FetchCss } from '../sheets/sheet-collector';
 import { augmentSelectors, exclusionSuffix } from '../sheets/selector';
 import { OwnedSheet } from './css-injector';
@@ -513,31 +512,6 @@ export class DarkEngine {
     }
   }
 
-  /**
-   * Gradient text (`background-clip:text` with a transparent fill): the gradient IS the text
-   * color, so its stops follow the text rules (dark stops lifted to stay readable) instead of
-   * the surface rules.
-   */
-  private applyGradientText(els: Element[]): void {
-    const mapper = this.mapper;
-    if (!mapper) return;
-    const found: Array<[Element, string | null]> = [];
-    for (const el of els) {
-      const cs = this.win.getComputedStyle(el);
-      const clipped = cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text';
-      if (!clipped || !cs.backgroundImage.includes('gradient(')) {
-        if (hasTokenKind(el, 'g')) found.push([el, null]);
-        continue;
-      }
-      const mapped = mapValue(cs.backgroundImage, 'accent', mapper);
-      found.push([el, mapped ? `background-image:${mapped}!important` : null]);
-    }
-    for (const [el, decl] of found) {
-      stripKind(el, 'g');
-      if (decl) addToken(el, this.tokens.idFor('g', decl));
-    }
-  }
-
   private analyzeTextureFor(url: string, el: Element): void {
     let waiting = this.texturePending.get(url);
     if (waiting) {
@@ -601,7 +575,6 @@ export class DarkEngine {
 
     // Phase 2b: light flat texture images (white page columns, title bars) darkened by blending.
     this.applyTextures(els);
-    this.applyGradientText(els);
 
     // Phase 3: contrast, SVG paint and banner-text checks against final computed styles.
     checker.resetCache();
