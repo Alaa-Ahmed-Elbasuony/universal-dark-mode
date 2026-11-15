@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shopfront</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f2f3f5; color: #1f2328; font: 15px/1.5 system-ui, sans-serif; }
+  header { background: #ffffff; border-bottom: 1px solid #e3e5e8; padding: 12px 24px; display: flex; gap: 20px; align-items: center; }
+  .brand { font-weight: 800; color: #e4002b; font-size: 20px; }
+  header input { flex: 1; background: #f2f3f5; border: 1px solid #d0d3d8; border-radius: 20px; padding: 8px 14px; color: #1f2328; }
+  .crumbs { padding: 10px 24px; color: #666c75; font-size: 13px; }
+  .layout { display: grid; grid-template-columns: 200px 1fr; gap: 20px; padding: 0 24px 24px; }
+  aside { background: #fff; border: 1px solid #e3e5e8; border-radius: 8px; padding: 12px; }
+  aside h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; color: #555b64; }
+  aside label { display: block; padding: 3px 0; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: #fff; border: 1px solid #e3e5e8; border-radius: 8px; padding: 12px; position: relative; }
+  .card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.15); border-color: #bfc3c9; }
+  .card img { width: 100%; height: 110px; display: block; border-radius: 6px; }
+  .badge { position: absolute; top: 18px; left: 18px; background: #e4002b; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .price { font-weight: 700; font-size: 17px; }
+  .old { color: #8a9099; text-decoration: line-through; font-size: 13px; margin-left: 6px; }
+  .sale { color: #b3001f; }
+  .stars svg { width: 14px; height: 14px; fill: #f5a623; }
+  .btn { background: #e4002b; color: #fff; border: 0; border-radius: 6px; padding: 8px 14px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; }
+  .btn.secondary { background: #fff; color: #1f2328; border: 1px solid #c2c6cc; }
+  .btn.secondary:hover { background: #f2f3f5; }
+  .detail { background: #fff; border: 1px solid #e3e5e8; border-radius: 8px; margin: 0 24px 24px; padding: 20px; display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
+  .thumbs { display: flex; gap: 8px; margin-top: 8px; }
+  .thumbs img { width: 56px; height: 56px; border: 2px solid #d0d3d8; border-radius: 6px; }
+  .thumbs img.sel { border-color: #e4002b; }
+  .sizes { display: flex; gap: 8px; margin: 8px 0; }
+  .sizes label { border: 1px solid #c2c6cc; border-radius: 6px; padding: 6px 12px; background: #fff; }
+  .tabs { display: flex; border-bottom: 1px solid #e3e5e8; margin-top: 16px; }
+  .tabs a { padding: 8px 14px; color: #555b64; text-decoration: none; }
+  .tabs a.on { color: #1f2328; border-bottom: 2px solid #e4002b; font-weight: 600; }
+  .review { border-top: 1px solid #eceef0; padding: 10px 0; }
+  footer { background: #1b1f24; color: #c9ced6; padding: 24px; }
+  footer a { color: #8ab4f8; }
+</style>
+</head>
+<body>
+<header><span class="brand">Shopfront</span><input id="search" placeholder="Search products" aria-label="Search products"><span>Cart (2)</span></header>
+<div class="crumbs">Home › Shoes › Running</div>
+<div class="layout">
+  <aside><h3>Filters</h3><label><input type="checkbox" checked> In stock</label><label><input type="checkbox"> On sale</label><h3>Size</h3><label><input type="radio" name="s" checked> 42</label><label><input type="radio" name="s"> 43</label></aside>
+  <div class="grid" id="grid">
+    <article class="card"><span class="badge">-30%</span><img alt="Shoe" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='110'%3E%3Crect width='200' height='110' fill='%23fdf0d5'/%3E%3Cellipse cx='100' cy='60' rx='60' ry='24' fill='%23c1121f'/%3E%3C/svg%3E"><h4>Trail Runner</h4><div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div><div><span class="price sale">$69</span><span class="old">$99</span></div><button class="btn">Add to cart</button></article>
+    <article class="card"><img alt="Shoe" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='110'%3E%3Crect width='200' height='110' fill='%23e0fbfc'/%3E%3Cellipse cx='100' cy='60' rx='60' ry='24' fill='%23003049'/%3E%3C/svg%3E"><h4>Road Racer</h4><div><span class="price">$120</span></div><button class="btn secondary">Add to cart</button></article>
+    <article class="card"><img alt="Shoe" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='110'%3E%3Crect width='200' height='110' fill='%23ffffff'/%3E%3Cellipse cx='100' cy='60' rx='60' ry='24' fill='%23588157'/%3E%3C/svg%3E"><h4>Daily Trainer</h4><div><span class="price">$85</span></div><button class="btn secondary">Add to cart</button></article>
+  </div>
+</div>
+<section class="detail" id="detail">
+  <div><img alt="Trail Runner large" width="280" height="200" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200'%3E%3Crect width='280' height='200' fill='%23fdf0d5'/%3E%3Cellipse cx='140' cy='110' rx='90' ry='36' fill='%23c1121f'/%3E%3C/svg%3E"><div class="thumbs"><img class="sel" alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Crect width='56' height='56' fill='%23fdf0d5'/%3E%3C/svg%3E"><img alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Crect width='56' height='56' fill='%23669bbc'/%3E%3C/svg%3E"></div></div>
+  <div><h2 style="margin-top:0">Trail Runner</h2><p class="price sale" style="font-size:22px">$69 <span class="old">$99</span></p><p>Lightweight shoe with a grippy outsole for wet trails.</p>
+    <div class="sizes"><label><input type="radio" name="sz"> 41</label><label><input type="radio" name="sz" checked> 42</label><label><input type="radio" name="sz"> 43</label></div>
+    <button class="btn" style="width:auto">Add to cart</button> <button class="btn secondary" style="width:auto">Save</button>
+    <div class="tabs"><a class="on" href="#d">Details</a><a href="#r">Reviews (12)</a></div>
+    <div class="review"><strong>Great grip</strong><div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div><p>Held up on muddy trails.</p></div>
+  </div>
+</section>
+<footer>© Shopfront · <a href="#help">Help</a> · <a href="#returns">Returns</a></footer>
+</body>
+</html>

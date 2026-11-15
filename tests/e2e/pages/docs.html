@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Docs</title>
+<style>
+  body { margin: 0; font: 16px/1.65 Georgia, 'Times New Roman', serif; color: #24292f; background: #ffffff; }
+  header { position: sticky; top: 0; background: #ffffff; border-bottom: 1px solid #d0d7de; padding: 10px 24px; display: flex; gap: 20px; font-family: system-ui, sans-serif; }
+  header a { color: #0969da; text-decoration: none; }
+  .wrap { display: grid; grid-template-columns: 230px 1fr; max-width: 1000px; margin: 0 auto; }
+  nav { padding: 20px 16px; border-right: 1px solid #d0d7de; font-family: system-ui, sans-serif; font-size: 14px; }
+  nav a { display: block; padding: 4px 8px; color: #57606a; text-decoration: none; border-radius: 6px; }
+  nav a.cur { background: #ddf4ff; color: #0550ae; font-weight: 600; }
+  article { padding: 20px 32px 60px; }
+  h1, h2 { font-family: system-ui, sans-serif; border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
+  code { background: #eff1f3; padding: 2px 6px; border-radius: 5px; font-size: 85%; }
+  pre { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 14px; overflow: auto; }
+  pre code { background: none; padding: 0; }
+  .k { color: #cf222e; } .s { color: #0a3069; } .f { color: #8250df; } .c { color: #6e7781; } .n { color: #0550ae; }
+  blockquote { margin: 16px 0; padding: 0 16px; color: #57606a; border-left: 4px solid #d0d7de; }
+  .note { background: #ddf4ff; border: 1px solid #54aeff66; border-radius: 8px; padding: 10px 14px; font-family: system-ui, sans-serif; }
+  .warn { background: #fff8c5; border: 1px solid #d4a72c66; border-radius: 8px; padding: 10px 14px; font-family: system-ui, sans-serif; color: #4d2d00; }
+  table { border-collapse: collapse; margin: 12px 0; }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; }
+  tr:nth-child(2n) td { background: #f6f8fa; }
+  kbd { background: #f6f8fa; border: 1px solid #d0d7de; border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px; font-size: 80%; }
+</style>
+</head>
+<body>
+<header><strong>Docs</strong><a href="#g">Guides</a><a href="#a">API</a></header>
+<div class="wrap">
+  <nav><a class="cur" href="#i">Introduction</a><a href="#q">Quick start</a><a href="#c">Configuration</a></nav>
+  <article id="content">
+    <h1>Quick start</h1>
+    <p>Install with <code>npm install acme</code>, then press <kbd>Ctrl</kbd> + <kbd>K</kbd> to search.</p>
+    <div class="note" id="note">Note: this guide targets version 2.</div>
+    <pre id="code"><code><span class="c">// create a client</span>
+<span class="k">const</span> client = <span class="f">createClient</span>(<span class="s">'https://api.example.com'</span>, { retries: <span class="n">3</span> });</code></pre>
+    <blockquote>Prefer environment variables for secrets.</blockquote>
+    <div class="warn" id="warn">Warning: this call is rate limited.</div>
+    <h2>Options</h2>
+    <table><thead><tr><th>Name</th><th>Default</th></tr></thead><tbody><tr><td><code>retries</code></td><td>0</td></tr><tr><td><code>timeout</code></td><td>30s</td></tr></tbody></table>
+  </article>
+</div>
+</body>
+</html>

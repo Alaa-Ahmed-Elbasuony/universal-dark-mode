@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Buttons and inputs</title>
+<style>
+  body { margin: 0; padding: 20px; background: #fff; color: #222; font: 15px/1.5 system-ui, sans-serif; }
+  h2 { margin: 18px 0 8px; font-size: 14px; color: #555; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 6px; }
+  .b-light { background: #f0f0f0; color: #222; border: 1px solid #999; padding: 6px 12px; border-radius: 4px; }
+  .b-light:hover { background: #e2e2e2; }
+  .b-white { background: #fff; color: #333; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; }
+  .b-ghost { background: transparent; color: #0b57d0; border: 1px solid #0b57d0; padding: 6px 12px; border-radius: 4px; }
+  .b-ghost:hover { background: #e8f0fe; }
+  .b-link { background: none; border: none; color: #0b57d0; text-decoration: underline; padding: 0; cursor: pointer; }
+  .b-brand { background: #0b57d0; color: #fff; border: 0; padding: 7px 14px; border-radius: 4px; }
+  .b-brand:hover { background: #0842a0; }
+  .b-yellow { background: #ffd60a; color: #000; border: 0; padding: 7px 14px; border-radius: 4px; }
+  .b-icon { background: #fff; border: 1px solid #bbb; border-radius: 50%; width: 34px; height: 34px; color: #333; display: inline-grid; place-items: center; }
+  .b-icon svg { width: 18px; height: 18px; fill: currentColor; }
+  .i-styled { background: #fff; color: #222; border: 1px solid #aaa; border-radius: 4px; padding: 6px 8px; }
+  .i-styled::placeholder { color: #888; }
+  .i-styled:focus { border-color: #0b57d0; outline: 2px solid #0b57d055; }
+  .i-ghost { background: transparent; border: 0; border-bottom: 2px solid #999; padding: 6px 2px; color: #222; }
+  .i-err { background: #fff; border: 1px solid #d93025; color: #222; padding: 6px 8px; }
+  .i-ok { background: #f6fff8; border: 1px solid #188038; color: #222; padding: 6px 8px; }
+</style>
+</head>
+<body>
+<h2>Native, unstyled</h2>
+<div class="row">
+  <button id="n-btn">Button</button>
+  <button id="n-btn-dis" disabled>Disabled</button>
+  <input id="n-text" type="text" placeholder="Text placeholder">
+  <input id="n-text-val" type="text" value="With a value">
+  <input id="n-email" type="email" placeholder="Email">
+  <input id="n-search" type="search" placeholder="Search">
+  <input id="n-num" type="number" value="3">
+  <input id="n-pw" type="password" value="secret">
+  <input id="n-dis" type="text" value="Disabled input" disabled>
+  <input id="n-ro" type="text" value="Read-only input" readonly>
+</div>
+<div class="row">
+  <input id="n-date" type="date"><input id="n-time" type="time"><input id="n-color" type="color" value="#3366ff">
+  <input id="n-range" type="range"><input id="n-file" type="file">
+  <label><input type="checkbox" checked> check</label><label><input type="radio" name="r" checked> radio</label><label><input type="radio" name="r"> radio</label>
+  <select id="n-select"><option>Option one</option><option>Option two</option></select>
+  <select id="n-select-multi" multiple size="2"><option>A</option><option>B</option></select>
+</div>
+<div class="row">
+  <textarea id="n-ta" rows="2" placeholder="Textarea"></textarea>
+  <progress value="40" max="100"></progress><meter value="0.6"></meter>
+  <input type="submit" id="n-submit" value="Submit"><input type="reset" value="Reset"><input type="button" value="Input button">
+</div>
+<details><summary id="n-summary">Details summary</summary>Hidden content</details>
+
+<h2>Styled by the page</h2>
+<div class="row">
+  <button class="b-light" id="s-light">Light gray</button>
+  <button class="b-white" id="s-white">White</button>
+  <button class="b-ghost" id="s-ghost">Ghost</button>
+  <button class="b-link" id="s-link">Link button</button>
+  <button class="b-brand" id="s-brand">Brand</button>
+  <button class="b-yellow" id="s-yellow">Yellow</button>
+  <button class="b-icon" id="s-icon" aria-label="Star"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></button>
+</div>
+<div class="row">
+  <input class="i-styled" id="s-input" placeholder="Styled input">
+  <input class="i-styled" id="s-input-val" value="Styled value">
+  <input class="i-ghost" id="s-ghost-input" placeholder="Underline input">
+  <input class="i-err" id="s-err" value="Error state">
+  <input class="i-ok" id="s-ok" value="Success state">
+  <textarea class="i-styled" id="s-ta" rows="2">Styled textarea</textarea>
+  <select class="i-styled" id="s-select"><option>Styled select</option></select>
+</div>
+</body>
+</html>

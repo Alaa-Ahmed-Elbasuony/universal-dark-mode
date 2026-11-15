@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unusual CSS</title>
+<style>
+  @namespace svg url(http://www.w3.org/2000/svg);
+  @import url("http://127.0.0.1:1/missing.css");
+  @layer base, theme;
+  @layer base { body { background: #ffffff; color: #111111; font: 16px system-ui; margin: 0; padding: 12px; } }
+  @layer theme { .layered { background: #eeeeee !important; color: #222222; padding: 14px; margin: 8px 0; } }
+  .nest { background: #f3f3f3; padding: 14px; margin: 8px 0; & .inner { background: #ffffff; color: #000000; padding: 10px; } &:hover { background: #e0e0e0; } }
+  .has-test:has(> .child) { background: #fafafa; padding: 14px; margin: 8px 0; }
+  .cqwrap { container-type: inline-size; }
+  @container (min-width: 10px) { .cq { background: #ffffff; color: #111111; padding: 14px; margin: 8px 0; } }
+  .bad { background: var(--undefined); color: not-a-color; border: 1px solid var(--also-missing, #dddddd); padding: 14px; margin: 8px 0; }
+  @media print { body { background: #ffffff; } }
+  @supports (display: grid) { .sup { background: #fefefe; color: #111111; padding: 14px; margin: 8px 0; } }
+  @font-face { font-family: x; src: local(Arial); }
+  @keyframes k { from { background: #ffffff; } to { background: #eeeeee; } }
+  .anim { animation: k 1s infinite paused; padding: 14px; color: #111; margin: 8px 0; }
+  @property --x { syntax: '<color>'; inherits: false; initial-value: #ffffff; }
+  .oklch { background: oklch(0.97 0.01 250); color: oklch(0.2 0.02 250); padding: 14px; margin: 8px 0; }
+  .hsl { background: hsl(210 20% 96%); color: hsl(210 20% 10%); padding: 14px; margin: 8px 0; }
+</style>
+</head>
+<body>
+  <div class="layered" id="layered">Layered important background</div>
+  <div class="nest" id="nest"><div class="inner" id="inner">Nested CSS child</div></div>
+  <div class="has-test" id="has"><span class="child">:has() selector</span></div>
+  <div class="cqwrap"><div class="cq" id="cq">Container query</div></div>
+  <div class="bad" id="bad">Unresolvable variables and invalid values</div>
+  <div class="sup" id="sup">@supports block</div>
+  <div class="anim" id="anim">Animated</div>
+  <div class="oklch" id="oklch">oklch() colors</div>
+  <div class="hsl" id="hsl">hsl() space-separated colors</div>
+</body>
+</html>

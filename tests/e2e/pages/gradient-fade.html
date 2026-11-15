@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tailwind-style gradient fade</title>
+<style>
+  *, ::before, ::after { --tw-gradient-from-position: ; --tw-gradient-to-position: ; }
+  body { margin: 0; background: #fff; color: #111; font: 16px system-ui, sans-serif; }
+  .wrap { position: relative; height: 240px; background: #f4f6f8; }
+  .bg-gradient-to-b { background-image: linear-gradient(to bottom, var(--tw-gradient-stops)); }
+  .from-transparent { --tw-gradient-from: transparent var(--tw-gradient-from-position); --tw-gradient-to: rgba(255,255,255,0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-white { --tw-gradient-to: #fff var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; }
+  .strip { height: 80px; }
+  .from-white { --tw-gradient-from: #fff var(--tw-gradient-from-position); --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
+</style>
+</head>
+<body>
+<p>Carousel</p>
+<div class="wrap"><div class="fade bg-gradient-to-b from-transparent to-white" id="fade"></div></div>
+<div class="strip bg-gradient-to-r from-white to-white" id="strip"></div>
+</body>
+</html>

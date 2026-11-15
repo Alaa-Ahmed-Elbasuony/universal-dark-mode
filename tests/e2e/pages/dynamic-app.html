@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dynamic app</title>
+<style>
+  body { margin: 0; padding: 16px; background: #fff; color: #222; font: 16px/1.5 system-ui, sans-serif; }
+  nav { display: flex; gap: 8px; margin-bottom: 12px; }
+  button { background: #f1f3f5; color: #222; border: 1px solid #bbb; padding: 6px 12px; border-radius: 6px; }
+  .item { background: #f7f7f9; border: 1px solid #e2e2e8; padding: 8px 12px; margin: 4px 0; }
+  .item:nth-child(even) { background: #ffffff; }
+  dialog { background: #ffffff; color: #1a1a1a; border: 1px solid #999; padding: 16px; }
+  .panel-a { background: #eef6ff; color: #123; padding: 12px; }
+  .panel-b { background: #fff7e6; color: #321; padding: 12px; }
+  .box-host { margin: 12px 0; }
+</style>
+</head>
+<body>
+  <nav>
+    <button id="go-a">Route A</button>
+    <button id="go-b">Route B</button>
+    <button id="open-modal">Open modal</button>
+    <button id="load-more">Load more</button>
+  </nav>
+  <div id="view"><section class="panel-a" id="route-content">Route A content</section></div>
+
+  <div class="box-host"><shadow-card id="shadow-card"></shadow-card></div>
+  <div class="box-host"><adopt-card id="adopt-card"></adopt-card></div>
+  <div class="box-host" id="cssinjs-host"></div>
+  <div class="box-host" id="docadopt-host"></div>
+
+  <dialog id="dlg"><p id="dlg-text">Modal content</p><button id="close-modal">Close</button></dialog>
+  <div id="list"></div>
+
+<script>
+  customElements.define('shadow-card', class extends HTMLElement {
+    constructor() {
+      super();
+      const r = this.attachShadow({ mode: 'open' });
+      r.innerHTML = '<style>.box{background:#ffffff;color:#222222;padding:12px;border:1px solid #cccccc}</style><div class="box" id="shadow-box">Shadow DOM with a style element</div>';
+    }
+  });
+  customElements.define('adopt-card', class extends HTMLElement {
+    constructor() {
+      super();
+      const r = this.attachShadow({ mode: 'open' });
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync('.box{background:#f5f5f5;color:#111111;padding:12px}');
+      r.adoptedStyleSheets = [sheet];
+      r.innerHTML = '<div class="box" id="adopt-box">Shadow DOM with an adopted sheet</div>';
+    }
+  });
+
+  // CSS-in-JS style: an empty <style>, rules inserted later through the CSSOM.
+  setTimeout(() => {
+    const st = document.createElement('style');
+    document.head.append(st);
+    st.sheet.insertRule('.cssinjs{background:#ffffff;color:#000000;padding:8px;border:1px solid #bbb}', 0);
+    const d = document.createElement('div');
+    d.className = 'cssinjs';
+    d.id = 'cssinjs';
+    d.textContent = 'Styled through insertRule';
+    document.getElementById('cssinjs-host').append(d);
+  }, 150);
+
+  // Document-level adopted stylesheet.
+  setTimeout(() => {
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync('.docadopt{background:#fafafa;color:#222222;padding:8px}');
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+    const d = document.createElement('div');
+    d.className = 'docadopt';
+    d.id = 'docadopt';
+    d.textContent = 'Document adopted sheet';
+    document.getElementById('docadopt-host').append(d);
+  }, 250);
+
+  // Modal
+  const dlg = document.getElementById('dlg');
+  document.getElementById('open-modal').onclick = () => dlg.showModal();
+  document.getElementById('close-modal').onclick = () => dlg.close();
+
+  // Infinite scroll stand-in
+  let n = 0;
+  document.getElementById('load-more').onclick = () => {
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < 200; i++) {
+      const d = document.createElement('div');
+      d.className = 'item';
+      d.textContent = 'Item ' + (++n);
+      frag.append(d);
+    }
+    document.getElementById('list').append(frag);
+  };
+
+  // SPA routing
+  const view = document.getElementById('view');
+  function render(route) {
+    view.innerHTML = route === 'b'
+      ? '<section class="panel-b" id="route-content">Route B content</section>'
+      : '<section class="panel-a" id="route-content">Route A content</section>';
+  }
+  document.getElementById('go-a').onclick = () => { history.pushState({}, '', '?route=a'); render('a'); };
+  document.getElementById('go-b').onclick = () => { history.pushState({}, '', '?route=b'); render('b'); };
+  window.addEventListener('popstate', () => render(new URLSearchParams(location.search).get('route') === 'b' ? 'b' : 'a'));
+</script>
+</body>
+</html>
