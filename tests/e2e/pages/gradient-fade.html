@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Tailwind-style gradient fade</title>
 <style>
-  *, ::before, ::after { --tw-gradient-from-position: ; --tw-gradient-to-position: ; }
+  *, ::before, ::after { --tw-gradient-from-position: ; --tw-gradient-via-position: ; --tw-gradient-to-position: ; }
   body { margin: 0; background: #fff; color: #111; font: 16px system-ui, sans-serif; }
   .wrap { position: relative; height: 240px; background: #f4f6f8; }
   .bg-gradient-to-b { background-image: linear-gradient(to bottom, var(--tw-gradient-stops)); }
@@ -15,6 +15,16 @@
   .from-white { --tw-gradient-from: #fff var(--tw-gradient-from-position); --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
   .from-brand { --tw-gradient-from: #005468 var(--tw-gradient-from-position); --tw-gradient-to: rgb(0 84 104 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
   .to-brand2 { --tw-gradient-to: #0a3d5c var(--tw-gradient-to-position); }
+  /* shadcn / Tailwind: stops written through the design system's HSL channel variables */
+  :root { --background: 0 0% 100%; --muted: 210 40% 96%; }
+  .from-background { --tw-gradient-from: hsl(var(--background)) var(--tw-gradient-from-position); --tw-gradient-to: hsl(var(--background) / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-muted\/20 { --tw-gradient-to: hsl(var(--muted) / 0.2) var(--tw-gradient-to-position); }
+  /* Tailwind v3 arbitrary-value gradient button: from-[#007E94] via-[#0199b8] to-[#02a2c2ae] */
+  .from-\[\#007E94\] { --tw-gradient-from: #007E94 var(--tw-gradient-from-position); --tw-gradient-to: rgb(0 126 148 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .via-\[\#0199b8\] { --tw-gradient-to: rgb(1 153 184 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #0199b8 var(--tw-gradient-via-position), var(--tw-gradient-to); }
+  .to-\[\#02a2c2ae\] { --tw-gradient-to: #02a2c2ae var(--tw-gradient-to-position); }
+  .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
+  .plan { display: block; width: 100%; height: 44px; border: 0; border-radius: 6px; color: #fff; font: 14px system-ui; }
   .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
 </style>
 </head>
@@ -23,5 +33,7 @@
 <p>Carousel</p>
 <div class="wrap"><div class="fade bg-gradient-to-b from-transparent to-white" id="fade"></div></div>
 <div class="strip bg-gradient-to-r from-white to-white" id="strip"></div>
+<div style="padding:16px"><button id="plan" class="plan bg-gradient-to-br from-[#007E94] via-[#0199b8] to-[#02a2c2ae]">Select Plan</button></div>
+<div class="strip bg-gradient-to-b from-background to-muted/20" id="shadcn" style="height:140px"></div>
 </body>
 </html>

@@ -58,7 +58,15 @@ test.describe('natively dark pages with translucent "glass" controls', () => {
     const channels = [...stops.matchAll(/rgba?\((\d+), (\d+), (\d+)/g)].map((m) => Math.max(+m[1]!, +m[2]!, +m[3]!));
     expect(channels.length).toBeGreaterThan(0);
     for (const c of channels) expect(c, `gradient text stop ${stops}`).toBeGreaterThan(110);
-    for (const id of ['#fade', '#strip']) {
+    // Arbitrary-value gradient button keeps a visible, opaque, teal gradient (all three stops).
+    const plan = await page.locator('#plan').evaluate((e) => {
+      const cs = getComputedStyle(e);
+      return { bg: cs.backgroundImage, to: cs.getPropertyValue('--tw-gradient-to'), stops: cs.getPropertyValue('--tw-gradient-stops') };
+    });
+    expect(plan.bg, 'plan button background').toContain('linear-gradient');
+    expect(plan.bg, 'plan button must show its via and to colors').toMatch(/rgb\(1, 153, 184\)/);
+    expect(plan.to, 'gradient end must be the page\'s own `to-` color, not the transparent from-default').not.toMatch(/, 0\)/);
+    for (const id of ['#fade', '#strip', '#shadcn']) {
       const bg = await css(page, id, 'background-image');
       expect(bg, `${id} must not keep white stops`).not.toMatch(/rgb\(255, 255, 255\)/);
       expect(bg).toContain('linear-gradient');

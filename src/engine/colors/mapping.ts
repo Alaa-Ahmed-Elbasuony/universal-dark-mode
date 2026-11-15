@@ -34,7 +34,7 @@ const surfaceBrandChroma = (l: number): number => (l > 0.9 ? BRAND_CHROMA : l > 
  * fields, buttons and outlines. Inverting them into a dark tint would erase those controls,
  * so they are kept: over our dark surfaces they give the same subtle lift.
  */
-const FILL_OVERLAY_MAX_ALPHA = 0.2; // glass fills are faint; `bg-muted/40` on a light page is a pale panel
+const FILL_OVERLAY_MAX_ALPHA = 0.15; // glass fills are faint; `bg-muted/40` on a light page is a pale panel
 const BORDER_OVERLAY_MAX_ALPHA = 0.4; // outlines can be stronger, and a kept pale border is harmless on light pages
 const isLightOverlay = (o: Oklch, alpha: number, maxAlpha: number): boolean =>
   alpha <= maxAlpha && o.l >= 0.8 && o.c < 0.05;
